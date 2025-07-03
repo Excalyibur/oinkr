@@ -24,6 +24,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def log_food(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.effective_user.id
+    user_name = update.effective_user.first_name
     text = update.message.text.strip()
 
     if ',' not in text:
@@ -32,16 +33,16 @@ async def log_food(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     food, calories_str = map(str.strip, text.rsplit(',', 1))
     try:
-        calories = int(calories_str)
+        calories = float(calories_str)
     except ValueError:
         await update.message.reply_text("Calories must be a number. Try again!")
         return
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
-    success = storage.append_log(user_id, food, calories, timestamp)
+    success = storage.append_log(user_name, food, calories, timestamp)
 
     if success:
-        await update.message.reply_text(f"✅ Logged: {food} ({calories} kcal)")
+        await update.message.reply_text(f"✅ Logged: \nCard: {food} \nSpend: ${calories}")
     else:
         await update.message.reply_text("❌ Oops, something went wrong saving your log. Try again later.")
 
@@ -90,7 +91,7 @@ async def log_food_with_photo(update: Update, context: ContextTypes.DEFAULT_TYPE
         await update.message.reply_text("❌ Error saving photo. Try again later.")
 
 async def show_logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_id = update.effective_user.id
+    user_id = update.effective_user.name
     today = datetime.now().strftime("%Y-%m-%d")
     logs = storage.get_today_logs(user_id, today)
 
@@ -98,7 +99,7 @@ async def show_logs(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("Nothing to oink about today 🐽")
         return
 
-    total_calories = sum(log['calories'] for log in logs)
+    total_calories = sum(log['Amount'] for log in logs)
 
     lines = [f"{log['timestamp']} — {log['food']} ({log['calories']} kcal)" for log in logs]
     response = f"🍽️ Today's food logs:\n" + "\n".join(lines)
@@ -141,5 +142,6 @@ async def webhook(request: Request):
 
     data = await request.json()
     update = Update.de_json(data, telegram_app.bot)
+    print(update)
     await telegram_app.process_update(update)
     return {"status": "ok"}

@@ -5,7 +5,7 @@ import os
 
 
 # Google Sheet ID
-SHEET_ID = "1LMpoNHFbtzXvJnfUUwCvSyjKw9PDEkrHtMsSz71NwSA"
+SHEET_ID = "13Yq3cEjCEuekKZlEUIJUA776wsiFTKm-bcf1U0_QObM"
 
 # Scopes for accessing Google Sheets API
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
@@ -85,15 +85,15 @@ def get_today_logs(user_id: int, today_date: str):
         for row in rows:
             try:
                 # Handle case where user_id might be stored as string
-                row_user_id = int(row.get('user_id', 0))
-                timestamp = row.get('timestamp', '')
+                row_user_id = int(row.get('User', 0))
+                timestamp = row.get('Date', '')
                 
                 # Check if this log is for the right user and from today
                 if row_user_id == user_id and timestamp.startswith(today_date):
                     log_entry = {
-                        "timestamp": timestamp,
-                        "food": row.get('food', ''),
-                        "calories": int(row.get('calories', 0))
+                        "Date": timestamp,
+                        "Card": row.get('Card', ''),
+                        "Amount": int(row.get('Amount', 0))
                     }
                     
                     # Add photo path if it exists
