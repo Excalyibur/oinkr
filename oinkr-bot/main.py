@@ -17,9 +17,8 @@ telegram_app = None  # Global reference to the Telegram Application
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🐷 Hey little piggy! Start logging your food.\n\n"
-        "📝 For text: Send 'food, calories' (e.g., apple, 95)\n"
-        "📸 For photos: Send a photo with 'food, calories' as caption"
+        "Start logging your spend.\n\n"
+        "Send in the format 'Card, Amount' (e.g., Citi, 95)\n"
     )
 
 async def log_food(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -28,14 +27,14 @@ async def log_food(update: Update, context: ContextTypes.DEFAULT_TYPE):
     text = update.message.text.strip()
 
     if ',' not in text:
-        await update.message.reply_text("Please log food like: food, calories (e.g., apple, 95)")
+        await update.message.reply_text("Please log spend like: card, amount (e.g., citi, 95)")
         return
 
     food, calories_str = map(str.strip, text.rsplit(',', 1))
     try:
         calories = float(calories_str)
     except ValueError:
-        await update.message.reply_text("Calories must be a number. Try again!")
+        await update.message.reply_text("Amount spent must be a number. Try again!")
         return
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
@@ -51,13 +50,13 @@ async def log_food_with_photo(update: Update, context: ContextTypes.DEFAULT_TYPE
     caption = update.message.caption
 
     if not caption:
-        await update.message.reply_text("📸 Please add a caption with: food, calories (e.g., apple, 95)")
+        await update.message.reply_text("📸 Please add a caption with: card, spend (e.g., citi, 95)")
         return
 
     caption = caption.strip()
 
     if ',' not in caption:
-        await update.message.reply_text("📸 Caption should be: food, calories (e.g., apple, 95)")
+        await update.message.reply_text("📸 Please add a caption with: card, spend (e.g., citi, 95)")
         return
 
     food, calories_str = map(str.strip, caption.rsplit(',', 1))
